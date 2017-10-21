@@ -15,18 +15,27 @@
 
 		public function __construct( $params = array() ){
 			
+			//ratio opacity
+			$this->ratioOpacity = 127/100;
+			
 			//save params
 			$this->params = $params;
 			
 			//convert params % to correct value
 			if( isset( $this->params["minOpacity"] ) ){
 				$this->minOpacity = 127 - ($this->params["minOpacity"] * 127/100);
+				
+				//set for opacity, based on minOpacity (100% to minOpacity by range size ex: 20,100) means 80 steps of opacity
+				$this->stepOpacityPercent = ( 100 - $this->params["minOpacity"] ) / ( $this->params["rangeSizeShape"][1] - $this->params["rangeSizeShape"][0] );
 			}
 			
 			//set lowerization level
 			if( !isset($this->params["lowerizationLvl"]) ){
 				$this->params["lowerizationLvl"] = 1;	
 			}		
+			
+			
+			
 
 			if( isset($this->params["fileName"]) && $this->params["fileName"] != null){
 				//get image
@@ -92,16 +101,16 @@
 			return $tmpImage;
 		}
 		
-		public function getOpacity( $opacity, $size ){
-
-			//check if min opacity exist
-			if( isset( $this->params["minOpacity"] ) ){
-				return rand(0, $this->minOpacity);
-			}else{
-				return $opacity;
-			}
-
+				
+		public function convertOpacityPercentToRealOpacityValue( $opacityPercent ){
+			return 127 - $opacityPercent * $this->ratioOpacity;
 		}
+		
+		
+		public function getOpacity( $opacity, $size ){
+			return $this->convertOpacityPercentToRealOpacityValue( 100 - $this->stepOpacityPercent * ( $size - $this->params["rangeSizeShape"][0]) );
+		}
+		
 		
 		public function generateSizeShape($a, $b, $lvl){
 			if( $lvl == 1 ){
@@ -166,9 +175,9 @@
 		"fileName"            => "pikachu.jpg",
 		"nbrPoint"            => 2000,
 		"shape"               => "rect",
-		"rangeSizeShape"	  => array(10,200),
-		"minOpacity"		  => 10,	//0 = hide | 100 = visible
-		"lowerizationLvl"	  => 5	
+		"rangeSizeShape"	  => array(10,100),
+		"minOpacity"		  => 30,	//0 = hide | 100 = visible
+		"lowerizationLvl"	  => 3	
 	);
 	
 	//launch object	
