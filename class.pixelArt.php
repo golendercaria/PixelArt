@@ -22,6 +22,11 @@
 			if( isset( $this->params["minOpacity"] ) ){
 				$this->minOpacity = 127 - ($this->params["minOpacity"] * 127/100);
 			}
+			
+			//set lowerization level
+			if( !isset($this->params["lowerizationLvl"]) ){
+				$this->params["lowerizationLvl"] = 1;	
+			}		
 
 			if( isset($this->params["fileName"]) && $this->params["fileName"] != null){
 				//get image
@@ -88,7 +93,7 @@
 		}
 		
 		public function getOpacity( $opacity, $size ){
-			
+
 			//check if min opacity exist
 			if( isset( $this->params["minOpacity"] ) ){
 				return rand(0, $this->minOpacity);
@@ -96,6 +101,15 @@
 				return $opacity;
 			}
 
+		}
+		
+		public function generateSizeShape($a, $b, $lvl){
+			if( $lvl == 1 ){
+				return rand($a, $b);
+			}else{
+				$lvl = $lvl-1;
+				return $this->generateSizeShape($a, rand($a, $b), $lvl);
+			}
 		}
 		
 		public function rect(){
@@ -117,7 +131,7 @@
 			foreach($this->listOfPoint as $point){
 
 				//generate random size and get the middle of shape
-				$sizeShape 		= rand($this->params["rangeSizeShape"][0], $this->params["rangeSizeShape"][1]);
+				$sizeShape = $this->generateSizeShape($this->params["rangeSizeShape"][0], $this->params["rangeSizeShape"][1], $this->params["lowerizationLvl"]);
 				$middleOfShape 	= round($sizeShape/2);
 				
 				//calculate the position of begin shape
@@ -150,10 +164,11 @@
 	//params for class
 	$params = array(
 		"fileName"            => "pikachu.jpg",
-		"nbrPoint"            => 1000,
+		"nbrPoint"            => 2000,
 		"shape"               => "rect",
-		"rangeSizeShape"	  => array(10,30),
-		"minOpacity"		  => 50,	//0 = hide | 100 = visible
+		"rangeSizeShape"	  => array(10,200),
+		"minOpacity"		  => 10,	//0 = hide | 100 = visible
+		"lowerizationLvl"	  => 5	
 	);
 	
 	//launch object	
