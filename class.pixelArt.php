@@ -12,12 +12,17 @@
 	class pixelArt{
 		
 		private $pathImage = "image/";
-		
+
 		public function __construct( $params = array() ){
 			
 			//save params
 			$this->params = $params;
 			
+			//convert params % to correct value
+			if( isset( $this->params["minOpacity"] ) ){
+				$this->minOpacity = 127 - ($this->params["minOpacity"] * 127/100);
+			}
+
 			if( isset($this->params["fileName"]) && $this->params["fileName"] != null){
 				//get image
 				$this->url 				= $this->pathImage . $this->params["fileName"];
@@ -82,6 +87,17 @@
 			return $tmpImage;
 		}
 		
+		public function getOpacity( $opacity, $size ){
+			
+			//check if min opacity exist
+			if( isset( $this->params["minOpacity"] ) ){
+				return rand(0, $this->minOpacity);
+			}else{
+				return $opacity;
+			}
+
+		}
+		
 		public function rect(){
 			
 			//check if point exist
@@ -112,12 +128,16 @@
 				$shapeXEnd = $shapeX + $sizeShape;
 				$shapeYEnd = $shapeY + $sizeShape;
 
+				//generate random opacity
+				$opacity = $this->getOpacity($point["color"]["alpha"], $sizeShape);
+
 				//prepare color
-				$tmpColor = imagecolorallocatealpha($tmpImage, $point["color"]["red"], $point["color"]["green"], $point["color"]["blue"], $point["color"]["alpha"]);
+				$tmpColor = imagecolorallocatealpha($tmpImage, $point["color"]["red"], $point["color"]["green"], $point["color"]["blue"], $opacity);
 				//construct shape on tmpImage
 				imagefilledrectangle($tmpImage, $shapeX, $shapeY, $shapeXEnd, $shapeYEnd, $tmpColor);
 					
 			}
+			
 			
 			imagepng($tmpImage, "image_created/rect.png");
 			imagedestroy($tmpImage);
@@ -132,7 +152,8 @@
 		"fileName"            => "pikachu.jpg",
 		"nbrPoint"            => 1000,
 		"shape"               => "rect",
-		"rangeSizeShape"	  => array(10,30)
+		"rangeSizeShape"	  => array(10,30),
+		"minOpacity"		  => 50,	//0 = hide | 100 = visible
 	);
 	
 	//launch object	
