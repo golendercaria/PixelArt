@@ -130,7 +130,7 @@
 	//params for class
 	$params = array(
 		"fileName"            => "pikachu.jpg",
-		"nbrPoint"            => 5,
+		"nbrPoint"            => 1000,
 		"shape"               => "rect",
 		"rangeSizeShape"	  => array(10,30)
 	);
