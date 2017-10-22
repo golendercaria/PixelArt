@@ -1,12 +1,10 @@
-# pixelArt
-
-
 pixelArt
 =====================
 
 Realise of a PHP script that can manipulate an image source and create images with a pixel style.
 Research and study with the use of the GD library.
 
+<img src="https://nouslesdevs.com/wp-content/uploads/2017/10/making_rect-example_opacityBySize_v2.png" alt="" />
 
 Documentation
 =============
