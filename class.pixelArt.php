@@ -11,7 +11,9 @@
 	
 	class pixelArt{
 		
-		private $pathImage = "image/";
+		private $pathImage 			= "image/";
+		private $percentBorderLess  = 90;
+		private $borderLessColor    = false;
 
 		public function __construct( $params = array() ){
 			
@@ -40,9 +42,6 @@
 				$this->params["lowerizationLvl"] = 1;	
 			}		
 			
-			
-			
-
 			if( isset($this->params["fileName"]) && $this->params["fileName"] != null){
 				//get image
 				$this->url 				= $this->pathImage . $this->params["fileName"];
@@ -50,12 +49,17 @@
 				
 				//save height and width of image
 				if( $this->imageRessource ){
-			    	$this->imageWidth 	= imagesx( $this->imageRessource );
-			    	$this->imageHeight 	= imagesy( $this->imageRessource );
+			    	$this->imageWidth 	= imagesx( $this->imageRessource )-1;
+			    	$this->imageHeight 	= imagesy( $this->imageRessource )-1;
 
 				}else{
 					echo "Image not loading";
 				}
+			}
+			
+			//border less
+			if( isset($this->params["borderLess"]) && $this->imageRessource){
+				$this->getBorderColor();
 			}
 		}
 		
@@ -71,22 +75,86 @@
 			while( $currentPoint < $this->params["nbrPoint"] ){
 				$currentPoint++;
 				
-				$tmpX = rand(0,$this->imageWidth-1);
-				$tmpY = rand(0,$this->imageHeight-1);
+				$tmpX = rand(0,$this->imageWidth);
+				$tmpY = rand(0,$this->imageHeight);
 				
 				$tmpPixel = $this->getPixelColor($tmpX, $tmpY);
+				
+				if( $this->borderLessColor ){
+					if( $tmpPixel["red"] == $this->borderLessColor["red"] && $tmpPixel["green"] == $this->borderLessColor["green"] && $tmpPixel["blue"] == $this->borderLessColor["blue"] ){
+						continue;
+					}
+				}
+				
 				$this->listOfPoint[] = array(
 					"x" => $tmpX, 
 					"y"	=> $tmpY, 
 					"color" => $tmpPixel
 				);
 			}
-			
+
 		}
 		
 		public function getPixelColor($x, $y){
 			$rgb = imagecolorat($this->imageRessource, $x, $y);
 			return imagecolorsforindex($this->imageRessource, $rgb);
+		}
+		
+		public function getBorderColor(){
+			$arrayColor = array();
+			$nbrPixel = 0;
+			//top and bottom
+			for($w = 0; $w <= $this->imageWidth; $w++){
+				$tmpPixel = $this->getPixelColor($w, 0);
+				if( !isset($arrayColor[$tmpPixel["red"]][$tmpPixel["green"]][$tmpPixel["blue"]]) ){
+					$arrayColor[$tmpPixel["red"]][$tmpPixel["green"]][$tmpPixel["blue"]] = 1;
+				}else{
+					$arrayColor[$tmpPixel["red"]][$tmpPixel["green"]][$tmpPixel["blue"]]++;
+				}
+				$tmpPixel = $this->getPixelColor($w, $this->imageHeight);
+				if( !isset($arrayColor[$tmpPixel["red"]][$tmpPixel["green"]][$tmpPixel["blue"]]) ){
+					$arrayColor[$tmpPixel["red"]][$tmpPixel["green"]][$tmpPixel["blue"]] = 1;
+				}else{
+					$arrayColor[$tmpPixel["red"]][$tmpPixel["green"]][$tmpPixel["blue"]]++;
+				}
+				$nbrPixel+=2;
+			}
+			
+			//left and right
+			for($h = 0; $h <= $this->imageHeight; $h++){
+				$tmpPixel = $this->getPixelColor(0, $h);
+				if( !isset($arrayColor[$tmpPixel["red"]][$tmpPixel["green"]][$tmpPixel["blue"]]) ){
+					$arrayColor[$tmpPixel["red"]][$tmpPixel["green"]][$tmpPixel["blue"]] = 1;
+				}else{
+					$arrayColor[$tmpPixel["red"]][$tmpPixel["green"]][$tmpPixel["blue"]]++;
+				}
+				$tmpPixel = $this->getPixelColor($this->imageWidth, $h);
+				if( !isset($arrayColor[$tmpPixel["red"]][$tmpPixel["green"]][$tmpPixel["blue"]]) ){
+					$arrayColor[$tmpPixel["red"]][$tmpPixel["green"]][$tmpPixel["blue"]] = 1;
+				}else{
+					$arrayColor[$tmpPixel["red"]][$tmpPixel["green"]][$tmpPixel["blue"]]++;
+				}
+				$nbrPixel+=2;
+			}
+		
+			//get max
+			$maxBorderOccurenceColor = array();
+			$tmpMax = 0;
+			foreach($arrayColor as $redValue => $redNext){
+				foreach($redNext as $greenValue => $greenNext){
+					foreach($greenNext as $blueValue => $occurence){
+						if( $occurence > $tmpMax ){
+							$tmpMax = $occurence;
+							$maxBorderOccurenceColor = array("red" => $redValue, "green" => $greenValue, "blue" => $blueValue);
+						}
+					}
+				}
+			}
+		
+			//check percent
+			if( ($tmpMax / $nbrPixel * 100) > $this->percentBorderLess ){
+				$this->borderLessColor = $maxBorderOccurenceColor;
+			}
 		}
 		
 		public function makingShape(){
@@ -106,12 +174,6 @@
 			
 			return $tmpImage;
 		}
-		
-				
-		public function convertOpacityPercentToRealOpacityValue( $opacityPercent ){
-			return 127 - $opacityPercent * $this->ratioOpacity;
-		}
-		
 		
 		public function getOpacity( $opacity, $size ){
 			return rand($size * $this->ratioOpacity, $this->maxOpacity);
@@ -179,11 +241,12 @@
 	//params for class
 	$params = array(
 		"fileName"            => "pikachu.jpg",
-		"nbrPoint"            => 5000,
+		"nbrPoint"            => 10000,
 		"shape"               => "rect",
 		"rangeSizeShape"	  => array(0,50),
 		"minOpacity"		  => 30,	//0 = hide | 100 = visible
-		"lowerizationLvl"	  => 2	
+		"lowerizationLvl"	  => 3,
+		"borderLess"		  => true	
 	);
 	
 	//launch object	
