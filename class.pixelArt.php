@@ -15,12 +15,18 @@
 
 		public function __construct( $params = array() ){
 			
-			//ratio opacity
-			$this->ratioOpacity = 127/100;
-			
 			//save params
 			$this->params = $params;
 			
+			//ratio opacity
+			if( isset($this->params["rangeSizeShape"][0]) ){
+				if( isset($this->params["minOpacity"]) ){
+					//max opacity in real alpha
+					$this->maxOpacity = 127 - 127/100*$this->params["minOpacity"];
+				}
+				$this->ratioOpacity = $this->maxOpacity / $this->params["rangeSizeShape"][1];
+			}
+
 			//convert params % to correct value
 			if( isset( $this->params["minOpacity"] ) ){
 				$this->minOpacity = 127 - ($this->params["minOpacity"] * 127/100);
@@ -108,7 +114,7 @@
 		
 		
 		public function getOpacity( $opacity, $size ){
-			return $this->convertOpacityPercentToRealOpacityValue( 100 - $this->stepOpacityPercent * ( $size - $this->params["rangeSizeShape"][0]) );
+			return rand($size * $this->ratioOpacity, $this->maxOpacity);
 		}
 		
 		
@@ -173,11 +179,11 @@
 	//params for class
 	$params = array(
 		"fileName"            => "pikachu.jpg",
-		"nbrPoint"            => 2000,
+		"nbrPoint"            => 5000,
 		"shape"               => "rect",
-		"rangeSizeShape"	  => array(10,100),
+		"rangeSizeShape"	  => array(0,50),
 		"minOpacity"		  => 30,	//0 = hide | 100 = visible
-		"lowerizationLvl"	  => 3	
+		"lowerizationLvl"	  => 2	
 	);
 	
 	//launch object	
