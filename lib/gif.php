@@ -91,7 +91,7 @@ Class GIFEncoder {
         } 
         GIFEncoder::GIFAddHeader ( ); 
         for ( $i = 0; $i < count ( $this->BUF ); $i++ ) { 
-            GIFEncoder::GIFAddFrames ( $i, $GIF_dly [ $i ] ); 
+            GIFEncoder::GIFAddFrames ( $i, $GIF_dly ); 
         } 
         GIFEncoder::GIFAddFooter ( ); 
     } 
