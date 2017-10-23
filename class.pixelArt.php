@@ -2,6 +2,8 @@
 
 	ini_set('memory_limit', '2048M');
 
+	include("lib/gif.php");
+
 	//error_reporting(0);
 	function pre($a = null){
 		echo "<pre>";
@@ -11,10 +13,12 @@
 	
 	class pixelArt{
 		
-		private $pathImage 			= "image/";
-		private $percentBorderLess  = 90;
-		private $borderLessColor    = false;
-
+		private $pathImage 					= "image/";
+		private $percentBorderLess  		= 90;
+		private $borderLessColor    		= false;
+		private $nbrAnimatedImage			= 10;
+		private $intervalDurationAnimation  = 100;
+		
 		public function __construct( $params = array() ){
 			
 			//save params
@@ -157,14 +161,18 @@
 			}
 		}
 		
-		public function makingShape(){
+		public function makingShape($return = false){
 			
 			//check if sufficient point
 			if( !isset($this->params["shape"]) ){
 				die("Not shape defined");
 			}
 			
-			$this->{$this->params["shape"]}();
+			if($return){
+				return $this->{$this->params["shape"]}();
+			}else{
+				$this->{$this->params["shape"]}();
+			}
 		}
 		
 		public function generateFusionImage(){
@@ -189,6 +197,39 @@
 			}
 		}
 		
+		public function makingAnimation(){
+			
+			//replac default nbr image
+			if( !isset($this->params["animated"]["nbrImage"]) ){
+				$this->nbrAnimatedImage = $this->params["animated"]["nbrImage"];
+			}
+			
+			//replace default interval
+			if( !isset($this->params["animated"]["timerInterval"]) ){
+				$this->intervalDurationAnimation = $this->params["animated"]["timerInterval"];
+			}
+
+			//construct image
+			$tmpListImg = array();
+			for($nbrImage = 0; $nbrImage < $this->nbrAnimatedImage; $nbrImage++){
+				$this->collectPixel();
+				//$tmpListImg[] = $this->makingShape(true);
+				
+				ob_start();
+				imagegif($this->makingShape(true));
+				$tmpListImg[] = ob_get_clean();
+
+				 
+			}
+
+			//making
+			
+				$gif = new GIFEncoder($tmpListImg, $this->intervalDurationAnimation, 0, 2, 0, 0, 0, 'bin');
+				header('Content-type: image/gif');
+				echo $gif->GetAnimation();
+				
+		}
+		
 		public function rect(){
 			
 			//check if point exist
@@ -198,7 +239,7 @@
 			
 			//check if range for size of shape
 			if( !isset($this->params["rangeSizeShape"][0]) || !isset($this->params["rangeSizeShape"][1]) ){
-				die("Missig range size shape");	
+				die("Missing range size shape");	
 			}
 			
 			//generate blank image 
@@ -229,30 +270,43 @@
 					
 			}
 			
+			//display or return image
+			if( isset($this->params["display"]) && $this->params["display"] == true ){				
+				imagepng($tmpImage, "image_created/rect.png");
+				imagedestroy($tmpImage);
+				?><img src="image_created/rect.png?<?php uniqid(); ?>" /><?php
+			}else{
+				return $tmpImage;
+			}
 			
-			imagepng($tmpImage, "image_created/rect.png");
-			imagedestroy($tmpImage);
 			
-			?><img src="image_created/rect.png?<?php uniqid(); ?>" /><?php
 		}
 
 	}
 	
 	//params for class
 	$params = array(
-		"fileName"            => "pikachu.jpg",
-		"nbrPoint"            => 10000,
+		"fileName"            => "sangoku.jpg",
+		"nbrPoint"            => 20000,
 		"shape"               => "rect",
-		"rangeSizeShape"	  => array(0,50),
+		"rangeSizeShape"	  => array(0,20),
 		"minOpacity"		  => 30,	//0 = hide | 100 = visible
-		"lowerizationLvl"	  => 3,
-		"borderLess"		  => true	
+		"lowerizationLvl"	  => 2,
+		"borderLess"		  => true,
+		"display"			  => false,
+		"animated"		  	  => array(
+			"nbrImage"		=> 3,
+			"timerInterval"	=> 100
+		)
 	);
 	
 	//launch object	
 	$imageRendering = new pixelArt($params);
+	$imageRendering->makingAnimation();
+	
+	/*
 	$imageRendering->collectPixel();
 	$imageRendering->makingShape();
-	
+	*/
 	
 	
