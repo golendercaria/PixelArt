@@ -168,10 +168,33 @@
 				die("Not shape defined");
 			}
 			
+			//rendering option
+
+			/*
+
+			
+			//display or return image
+			if( isset($this->params["display"]) && $this->params["display"] == true ){				
+				imagepng($tmpImage, "image_created/rect.png");
+				imagedestroy($tmpImage);
+				?><img src="image_created/rect.png?<?php uniqid(); ?>" /><?php
+			}else{
+				return $tmpImage;
+			}
+				
+			*/
+			
 			if($return){
 				return $this->{$this->params["shape"]}();
 			}else{
-				$this->{$this->params["shape"]}();
+				$image = $this->{$this->params["shape"]}();
+				if( isset($this->params["exportMode"]) ){
+					if( $this->params["exportMode"] == "image" ){
+						header('Content-type: image');
+						imagepng($image);
+						exit();						
+					}
+				}
 			}
 		}
 		
@@ -199,7 +222,7 @@
 		
 		public function makingAnimation(){
 			
-			//replac default nbr image
+			//replace default nbr image
 			if( !isset($this->params["animated"]["nbrImage"]) ){
 				$this->nbrAnimatedImage = $this->params["animated"]["nbrImage"];
 			}
@@ -208,7 +231,7 @@
 			if( !isset($this->params["animated"]["timerInterval"]) ){
 				$this->intervalDurationAnimation = $this->params["animated"]["timerInterval"];
 			}
-
+		
 			//construct image
 			$tmpListImg = array();
 			for($nbrImage = 0; $nbrImage < $this->nbrAnimatedImage; $nbrImage++){
@@ -218,16 +241,14 @@
 				ob_start();
 				imagegif($this->makingShape(true));
 				$tmpListImg[] = ob_get_clean();
-
+		
 				 
 			}
-
+		
 			//making
-			
-				$gif = new GIFEncoder($tmpListImg, $this->intervalDurationAnimation, 0, 2, 0, 0, 0, 'bin');
-				header('Content-type: image/gif');
-				echo $gif->GetAnimation();
-				
+			$gif = new GIFEncoder($tmpListImg, $this->intervalDurationAnimation, 0, 2, 0, 0, 0, 'bin');
+			header('Content-type: image/gif');
+			echo $gif->GetAnimation();	
 		}
 		
 		public function rect(){
@@ -270,15 +291,7 @@
 					
 			}
 			
-			//display or return image
-			if( isset($this->params["display"]) && $this->params["display"] == true ){				
-				imagepng($tmpImage, "image_created/rect.png");
-				imagedestroy($tmpImage);
-				?><img src="image_created/rect.png?<?php uniqid(); ?>" /><?php
-			}else{
-				return $tmpImage;
-			}
-			
+			return $tmpImage;			
 			
 		}
 
@@ -293,7 +306,7 @@
 		"minOpacity"		  => 30,	//0 = hide | 100 = visible
 		"lowerizationLvl"	  => 2,
 		"borderLess"		  => true,
-		"display"			  => false,
+		"exportMode"		  => "image",				
 		"animated"		  	  => array(
 			"nbrImage"		=> 3,
 			"timerInterval"	=> 100
@@ -303,8 +316,9 @@
 	//launch object	
 	$imageRendering = new pixelArt($params);
 	$imageRendering->makingAnimation();
-	
+
 	/*
+	$imageRendering = new pixelArt($params);
 	$imageRendering->collectPixel();
 	$imageRendering->makingShape();
 	*/
