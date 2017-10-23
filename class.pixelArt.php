@@ -17,7 +17,7 @@
 		private $percentBorderLess  		= 90;
 		private $borderLessColor    		= false;
 		private $nbrAnimatedImage			= 10;
-		private $intervalDurationAnimation  = 100;
+		private $intervalDurationAnimation  = 1000;
 		
 		public function __construct( $params = array() ){
 			
@@ -223,12 +223,12 @@
 		public function makingAnimation(){
 			
 			//replace default nbr image
-			if( !isset($this->params["animated"]["nbrImage"]) ){
+			if( isset($this->params["animated"]["nbrImage"]) ){
 				$this->nbrAnimatedImage = $this->params["animated"]["nbrImage"];
 			}
 			
 			//replace default interval
-			if( !isset($this->params["animated"]["timerInterval"]) ){
+			if( isset($this->params["animated"]["timerInterval"]) ){
 				$this->intervalDurationAnimation = $this->params["animated"]["timerInterval"];
 			}
 		
@@ -244,9 +244,9 @@
 		
 				 
 			}
-		
+	
 			//making
-			$gif = new GIFEncoder($tmpListImg, $this->intervalDurationAnimation, 0, 2, 0, 0, 0, 'bin');
+			$gif = new GIFEncoder($tmpListImg, $this->intervalDurationAnimation/10, 0, 2, 0, 0, 0, 'bin');
 			header('Content-type: image/gif');
 			echo $gif->GetAnimation();	
 		}
