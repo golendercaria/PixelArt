@@ -16,6 +16,7 @@
 		private $pathImage 					= "image/";
 		private $percentBorderLess  		= 90;
 		private $borderLessColor    		= false;
+		private $randomColor				= false;
 		private $nbrAnimatedImage			= 10;
 		private $intervalDurationAnimation  = 1000;
 		
@@ -65,6 +66,11 @@
 			if( isset($this->params["borderLess"]) && $this->imageRessource){
 				$this->getBorderColor();
 			}
+			
+			//random color
+			if( isset($this->params["randomColor"]) && $this->imageRessource){
+				$this->randomColor = true;
+			}
 		}
 		
 		public function collectPixel(){
@@ -88,6 +94,12 @@
 					if( $tmpPixel["red"] == $this->borderLessColor["red"] && $tmpPixel["green"] == $this->borderLessColor["green"] && $tmpPixel["blue"] == $this->borderLessColor["blue"] ){
 						continue;
 					}
+				}
+				
+				if( $this->randomColor ){
+					$tmpPixel["red"] = rand(0, 255);
+					$tmpPixel["green"] = rand(0, 255);
+					$tmpPixel["blue"] = rand(0, 255);
 				}
 				
 				$this->listOfPoint[] = array(
@@ -198,12 +210,16 @@
 			}
 		}
 		
-		public function generateFusionImage(){
-			$tmpImage  	= imagecreatetruecolor($this->imageWidth, $this->imageHeight);
-			$whiteBg 	= imagecolorallocate($tmpImage, 255, 255, 255);
-			imagefill($tmpImage, 0, 0, $whiteBg);
-			
-			return $tmpImage;
+		public function generateFusionImage($blank = true){
+			if( $blank === true){	
+				$tmpImage  	= imagecreatetruecolor($this->imageWidth, $this->imageHeight);
+				$whiteBg 	= imagecolorallocate($tmpImage, 255, 255, 255);
+				imagefill($tmpImage, 0, 0, $whiteBg);
+				
+				return $tmpImage;
+			}else{
+				return $this->imageRessource;
+			}
 		}
 		
 		public function getOpacity( $opacity, $size ){
@@ -264,7 +280,7 @@
 			}
 			
 			//generate blank image 
-			$tmpImage = $this->generateFusionImage();
+			$tmpImage = $this->generateFusionImage(true);
 			
 			//making shape for each point
 			foreach($this->listOfPoint as $point){
@@ -308,25 +324,25 @@
 			}
 			
 			//generate blank image 
-			$tmpImage = $this->generateFusionImage();
-			
-			foreach($this->listOfPoint as $point){
+			$tmpImage = $this->generateFusionImage(false);
 
+			foreach($this->listOfPoint as $point){
+		
 				//posPoly 
 				$posPoly = $this->generatePoly($point);
 				
 				//get size
 				$sizeShape = $posPoly[1] - end($posPoly);
-
+		
 				//generate random opacity
 				$opacity = $this->getOpacity($point["color"]["alpha"], $sizeShape);
-
+		
 				//prepare color
 				$tmpColor = imagecolorallocatealpha($tmpImage, $point["color"]["red"], $point["color"]["green"], $point["color"]["blue"], $opacity);
 				
 				//create poly
 				imagefilledpolygon( $tmpImage, $posPoly, $this->anglePoly, $tmpColor);
-
+		
 			}
 			
 			return $tmpImage;
@@ -369,13 +385,14 @@
 	//params for class
 	$params = array(
 		"fileName"            => "snow.jpg",
-		"nbrPoint"            => 10,
+		"nbrPoint"            => 7,
 		"shape"               => "triangle",
-		"rangeSizeShape"	  => array(0,100),
-		"minOpacity"		  => 30,	//0 = hide | 100 = visible
-		"lowerizationLvl"	  => 1,
+		"rangeSizeShape"	  => array(0,300),
+		"minOpacity"		  => 10,	//0 = hide | 100 = visible
+		"lowerizationLvl"	  => 3,
 		"borderLess"		  => false,
-		"exportMode"		  => "image",				
+		"exportMode"		  => "image",	
+		"randomColor"		  => true			
 	);
 	
 	//launch object	
