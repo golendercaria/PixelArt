@@ -294,9 +294,97 @@
 			return $tmpImage;			
 			
 		}
+		
+		public function triangle(){
+			
+			//check if point exist
+			if( empty($this->listOfPoint) ){
+				die("Empty listOfPoint");
+			}
+			
+			//check if range for size of shape
+			if( !isset($this->params["rangeSizeShape"][0]) || !isset($this->params["rangeSizeShape"][1]) ){
+				die("Missing range size shape");	
+			}
+			
+			//generate blank image 
+			$tmpImage = $this->generateFusionImage();
+			
+			foreach($this->listOfPoint as $point){
 
+				//posPoly 
+				$posPoly = $this->generatePoly($point);
+				
+				//get size
+				$sizeShape = $posPoly[1] - end($posPoly);
+
+				//generate random opacity
+				$opacity = $this->getOpacity($point["color"]["alpha"], $sizeShape);
+
+				//prepare color
+				$tmpColor = imagecolorallocatealpha($tmpImage, $point["color"]["red"], $point["color"]["green"], $point["color"]["blue"], $opacity);
+				
+				//create poly
+				imagefilledpolygon( $tmpImage, $posPoly, $this->anglePoly, $tmpColor);
+
+			}
+			
+			return $tmpImage;
+				
+		}
+		
+		public function generatePoly($point){
+			
+			//size of poly
+			$size = rand($this->params["rangeSizeShape"][0], $this->params["rangeSizeShape"][1]);
+			//direction of poly
+			$topOrBottom = rand(0,1);			
+			
+			if( $this->params["shape"] == "triangle" ){
+				//coordinate of point
+				$pointX = $point["x"] - $size;
+				$pointY = $point["x"] + $size;
+		
+				if( $topOrBottom == 0 ){
+					$pointZ = $point["y"] - $size;
+				}else{
+					$pointZ = $point["y"] + $size;
+				}
+				
+				//define number of point for GD function
+				$this->anglePoly = 3;
+				
+				return array(
+					$pointX, $point["y"], //x y
+					$pointY, $point["y"], //x y
+					$point["x"], $pointZ, //x y
+				);
+			}
+			
+		}
 	}
 	
+	
+	
+	//params for class
+	$params = array(
+		"fileName"            => "snow.jpg",
+		"nbrPoint"            => 10,
+		"shape"               => "triangle",
+		"rangeSizeShape"	  => array(0,100),
+		"minOpacity"		  => 30,	//0 = hide | 100 = visible
+		"lowerizationLvl"	  => 1,
+		"borderLess"		  => false,
+		"exportMode"		  => "image",				
+	);
+	
+	//launch object	
+	$imageRendering = new pixelArt($params);
+	$imageRendering->collectPixel();
+	$imageRendering->makingShape();
+	
+	
+	/*
 	//params for class
 	$params = array(
 		"fileName"            => "sangoku.jpg",
@@ -316,7 +404,10 @@
 	//launch object	
 	$imageRendering = new pixelArt($params);
 	$imageRendering->makingAnimation();
-
+	*/
+	
+	
+	
 	/*
 	$imageRendering = new pixelArt($params);
 	$imageRendering->collectPixel();
