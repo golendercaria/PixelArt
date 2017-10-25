@@ -328,15 +328,15 @@
 
 			foreach($this->listOfPoint as $point){
 		
+				//size of poly
+				$sizeShape = rand($this->params["rangeSizeShape"][0], $this->params["rangeSizeShape"][1]);
+		
 				//posPoly 
-				$posPoly = $this->generatePoly($point);
-				
-				//get size
-				$sizeShape = $posPoly[1] - end($posPoly);
+				$posPoly = $this->generatePoly($point, $sizeShape);
 		
 				//generate random opacity
 				$opacity = $this->getOpacity($point["color"]["alpha"], $sizeShape);
-		
+
 				//prepare color
 				$tmpColor = imagecolorallocatealpha($tmpImage, $point["color"]["red"], $point["color"]["green"], $point["color"]["blue"], $opacity);
 				
@@ -349,22 +349,20 @@
 				
 		}
 		
-		public function generatePoly($point){
+		public function generatePoly($point, $sizeShape){
 			
-			//size of poly
-			$size = rand($this->params["rangeSizeShape"][0], $this->params["rangeSizeShape"][1]);
 			//direction of poly
 			$topOrBottom = rand(0,1);			
 			
 			if( $this->params["shape"] == "triangle" ){
 				//coordinate of point
-				$pointX = $point["x"] - $size;
-				$pointY = $point["x"] + $size;
+				$pointX = $point["x"] - $sizeShape;
+				$pointY = $point["x"] + $sizeShape;
 		
 				if( $topOrBottom == 0 ){
-					$pointZ = $point["y"] - $size;
+					$pointZ = $point["y"] - $sizeShape;
 				}else{
-					$pointZ = $point["y"] + $size;
+					$pointZ = $point["y"] + $sizeShape;
 				}
 				
 				//define number of point for GD function
