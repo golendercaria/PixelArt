@@ -201,7 +201,7 @@
 			}else{
 				$image = $this->{$this->params["shape"]}();
 				if( isset($this->params["exportMode"]) ){
-					if( $this->params["exportMode"] == "image" ){
+					if( $this->params["exportMode"] == "display" ){
 						header('Content-type: image');
 						imagepng($image);
 						exit();						
@@ -358,6 +358,10 @@
 			return $this->polygoneShape();
 		}
 		
+		public function sandglass(){
+			return $this->polygoneShape();
+		}
+		
 		public function generatePoly($point, $sizeShape){
 			
 			//direction of poly
@@ -396,6 +400,30 @@
 					$point2, $point["y"], //x y
 					$point["x"], $point4, //x y
 				);
+			}elseif( $this->params["shape"] == "sandglass" ){
+				$point1 = $point["x"] - $sizeShape;
+				$point2 = $point["x"] + $sizeShape;
+				$point3 = $point["y"] - $sizeShape;
+				$point4 = $point["y"] + $sizeShape;
+
+				$this->anglePoly = 4;
+				
+				if( $topOrBottom == 0 ){					
+					return array(
+						$point1, $point["y"], //x y
+						$point["x"], $point3, //x y
+						$point["x"], $point4, //x y
+						$point2, $point["y"], //x y
+					);
+				}else{
+					return array(
+						$point1, $point["y"], //x y
+						$point["x"], $point4, //x y
+						$point["x"], $point3, //x y
+						$point2, $point["y"], //x y
+					);
+				}
+				
 			}
 			
 		}
@@ -407,12 +435,12 @@
 	$params = array(
 		"fileName"            => "fire.jpg",
 		"nbrPoint"            => 4,
-		"shape"               => "diamond",
-		"rangeSizeShape"	  => array(0,500),
+		"shape"               => "sandglass",
+		"rangeSizeShape"	  => array(0,300),
 		"minOpacity"		  => 10,	//0 = hide | 100 = visible
 		"lowerizationLvl"	  => 1,
 		"borderLess"		  => false,
-		"exportMode"		  => "image",	
+		"exportMode"		  => "display",	
 		"randomColor"		  => false			
 	);
 	
