@@ -40,7 +40,9 @@ $params = array(
 	"rangeSizeShape"	  => array(0,50),
 	"minOpacity"		  => 30,	//0 = hide | 100 = visible
 	"lowerizationLvl"	  => 3,
-	"borderLess"		  => true	
+	"borderLess"		  => true,
+	"exportMode"		  => "display",	
+	"randomColor"		  => false	
 );
 
 //launch object	
@@ -48,3 +50,35 @@ $imageRendering = new pixelArt($params);
 $imageRendering->collectPixel();
 $imageRendering->makingShape();
 ```
+
+Animation
+---------
+Use animated params for making gif picture.
+
+```php
+$params = array(
+	"fileName"            => "sangoku.jpg",
+	"nbrPoint"            => 20000,
+	"shape"               => "rect",
+	"rangeSizeShape"	  => array(0,20),
+	"minOpacity"		  => 30,	//0 = hide | 100 = visible
+	"lowerizationLvl"	  => 2,
+	"borderLess"		  => true,
+	"exportMode"		  => "display",				
+	"animated"		  	  => array(
+		"nbrImage"		=> 3,
+		"timerInterval"	=> 100
+	)
+);
+
+//launch object	
+$imageRendering = new pixelArt($params);
+$imageRendering->makingAnimation();
+```
+
+Available shape
+---------------
+- rect (rectangle)
+- triangle
+- diamond
+- sandglass
