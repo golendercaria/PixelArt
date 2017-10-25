@@ -311,7 +311,8 @@
 			
 		}
 		
-		public function triangle(){
+		
+		public function polygoneShape(){
 			
 			//check if point exist
 			if( empty($this->listOfPoint) ){
@@ -346,7 +347,15 @@
 			}
 			
 			return $tmpImage;
-				
+		
+		}
+		
+		public function triangle(){
+			return $this->polygoneShape();
+		}
+		
+		public function diamond(){
+			return $this->polygoneShape();
 		}
 		
 		public function generatePoly($point, $sizeShape){
@@ -373,6 +382,20 @@
 					$pointY, $point["y"], //x y
 					$point["x"], $pointZ, //x y
 				);
+			}elseif( $this->params["shape"] == "diamond" ){
+				$point1 = $point["x"] - $sizeShape;
+				$point2 = $point["x"] + $sizeShape;
+				$point3 = $point["y"] - $sizeShape;
+				$point4 = $point["y"] + $sizeShape;
+
+				$this->anglePoly = 4;
+				
+				return array(
+					$point1, $point["y"], //x y
+					$point["x"], $point3, //x y
+					$point2, $point["y"], //x y
+					$point["x"], $point4, //x y
+				);
 			}
 			
 		}
@@ -382,15 +405,15 @@
 	
 	//params for class
 	$params = array(
-		"fileName"            => "snow.jpg",
-		"nbrPoint"            => 7,
-		"shape"               => "triangle",
-		"rangeSizeShape"	  => array(0,300),
+		"fileName"            => "fire.jpg",
+		"nbrPoint"            => 4,
+		"shape"               => "diamond",
+		"rangeSizeShape"	  => array(0,500),
 		"minOpacity"		  => 10,	//0 = hide | 100 = visible
-		"lowerizationLvl"	  => 3,
+		"lowerizationLvl"	  => 1,
 		"borderLess"		  => false,
 		"exportMode"		  => "image",	
-		"randomColor"		  => true			
+		"randomColor"		  => false			
 	);
 	
 	//launch object	
