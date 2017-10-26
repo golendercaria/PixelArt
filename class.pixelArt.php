@@ -361,6 +361,44 @@
 		public function sandglass(){
 			return $this->polygoneShape();
 		}
+				
+		public function circle(){
+			
+			//check if point exist
+			if( empty($this->listOfPoint) ){
+				die("Empty listOfPoint");
+			}
+			
+			//check if range for size of shape
+			if( !isset($this->params["rangeSizeShape"][0]) || !isset($this->params["rangeSizeShape"][1]) ){
+				die("Missing range size shape");	
+			}
+			
+			//generate blank image 
+			$tmpImage = $this->generateFusionImage(false);
+
+			foreach($this->listOfPoint as $point){
+		
+				//size of circle
+				$sizeShape = rand($this->params["rangeSizeShape"][0], $this->params["rangeSizeShape"][1]);
+		
+				//posPoly 
+				$point["x"] = intval($point["x"] - $sizeShape/2);
+				$point["y"] = intval($point["y"] - $sizeShape/2);
+		
+				//generate random opacity
+				$opacity = $this->getOpacity($point["color"]["alpha"], $sizeShape);
+
+				//prepare color
+				$tmpColor = imagecolorallocatealpha($tmpImage, $point["color"]["red"], $point["color"]["green"], $point["color"]["blue"], $opacity);
+				
+				//create circle
+				imagefilledellipse($tmpImage, $point["x"], $point["y"], $sizeShape, $sizeShape, $tmpColor);
+			}
+			
+			return $tmpImage;
+		
+		}
 		
 		public function generatePoly($point, $sizeShape){
 			
@@ -433,10 +471,10 @@
 	
 	//params for class
 	$params = array(
-		"fileName"            => "fire.jpg",
-		"nbrPoint"            => 4,
-		"shape"               => "sandglass",
-		"rangeSizeShape"	  => array(0,300),
+		"fileName"            => "foyer.jpg",
+		"nbrPoint"            => 10,
+		"shape"               => "circle",
+		"rangeSizeShape"	  => array(0,50),
 		"minOpacity"		  => 10,	//0 = hide | 100 = visible
 		"lowerizationLvl"	  => 1,
 		"borderLess"		  => false,
